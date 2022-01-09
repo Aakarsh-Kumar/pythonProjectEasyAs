@@ -63,22 +63,29 @@ def create_post():
 
 @views.route("/delete-post/<id>")
 @login_required
-def delete_post(id):
-    post = Post.query.filter_by(id=id).first()
+post = Post.query.filter_by(id=id).first()
+    comment = Comment.query.filter_by(post_id=id).first()
 
     if not post:
         flash("Post does not exist.", category='error')
     if current_user.id == 1:
+        for comment in post.comments:
+            db.session.delete(comment)
+            db.session.commit()
         db.session.delete(post)
         db.session.commit()
         flash('Post deleted.', category='success')
     elif current_user.id != post.author:
         flash('You do not have permission to delete this post.', category='error')
     else:
+        for comment in post.comments:
+            db.session.delete(comment)
+            db.session.commit()
         db.session.delete(post)
         db.session.commit()
         flash('Post deleted.', category='success')
     return redirect(url_for('views.home'))
+
 
 
 @views.route("/IMG/<imgid>")
@@ -340,11 +347,15 @@ def delete_chat(chat_comment_id):
 @login_required
 def delete_message(id):
     message = Message.query.filter_by(id=id).first()
+    chat_comment = Chat_comment.query.filter_by(message_id=id).first()
 
     if not message:
         flash("Post does not exist.", category='error')
 
     else:
+        for chat_comment in message.comments:
+            db.session.delete(chat_comment)
+            db.session.commit()
         db.session.delete(message)
         db.session.commit()
         flash('message deleted.', category='success')
