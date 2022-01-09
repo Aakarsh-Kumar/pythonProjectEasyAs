@@ -64,7 +64,7 @@ def create_post():
 @views.route("/delete-post/<id>")
 @login_required
 def delete_post(id):
-post = Post.query.filter_by(id=id).first()
+    post = Post.query.filter_by(id=id).first()
     comment = Comment.query.filter_by(post_id=id).first()
 
     if not post:
